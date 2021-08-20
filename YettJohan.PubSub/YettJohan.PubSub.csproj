@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -9,6 +9,11 @@
         <Description>Simple and easy to use library for pub/sub design pattern.</Description>
         <PackageTags>YettJohan PubSub</PackageTags>
         <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageLicenseUrl></PackageLicenseUrl>
+        <Copyright>MIT</Copyright>
+        <PackageLicenseFile>C:\Users\jetty\Documents\Projects\YettPubSub\YettJohan.PubSub\LICENSE.txt</PackageLicenseFile>
+        <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     </PropertyGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Test": {
+    "Program": {
       "commandName": "Project",
       "hotReloadEnabled": true
     },

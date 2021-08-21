@@ -10,7 +10,6 @@
         <PackageTags>YettJohan PubSub</PackageTags>
         <PackageReleaseNotes>Initial release</PackageReleaseNotes>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageLicenseUrl></PackageLicenseUrl>
         <Copyright>MIT</Copyright>
         <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>

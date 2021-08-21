@@ -8,11 +8,12 @@
         <Authors>Jett Yuen</Authors>
         <Description>Simple and easy to use library for pub/sub design pattern.</Description>
         <PackageTags>YettJohan PubSub</PackageTags>
-        <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+        <PackageReleaseNotes>Major functionality improvements from initial release</PackageReleaseNotes>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Copyright>MIT</Copyright>
         <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Version>$(VersionPrefix)2.00</Version>
     </PropertyGroup>
 
 </Project>

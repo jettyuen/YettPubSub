@@ -42,7 +42,8 @@ namespace YettJohan.PubSub {
                 }
             }
         }
-        public void CreateTopic(object sender, EventArgs eventArgs, string name) {
+        public void CreateTopic(object sender, EventArgs eventArgs,
+                string name) {
             if (_topicsByPublisher.ContainsKey(sender)) {
                 _topicsByPublisher[sender].Add(new Topic(eventArgs, name));
                 return;

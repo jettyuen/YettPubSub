@@ -4,6 +4,8 @@ namespace YettJohan.PubSub.Executable {
         public ValueChangedArgs(T value) {
             Value = value;
         }
+        public ValueChangedArgs() {
+        }
         public T? Value { get; }
     }
 }

@@ -12,8 +12,8 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageLicenseUrl></PackageLicenseUrl>
         <Copyright>MIT</Copyright>
-        <PackageLicenseFile>C:\Users\jetty\Documents\Projects\YettPubSub\YettJohan.PubSub\LICENSE.txt</PackageLicenseFile>
         <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
 </Project>

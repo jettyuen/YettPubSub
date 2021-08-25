@@ -1,71 +1,94 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 namespace YettJohan.PubSub {
     public class EventHub {
         private readonly Dictionary<object, List<Topic>>
                 _topicsByPublisher = new();
-        public void Publish(object sender, string name, EventArgs eventArgs) {
-            if (!TopicExists(sender, eventArgs, name)) {
-                return;
+        private readonly Dictionary<Type, List<Topic>>
+                _topicsByType = new();
+        public void Publish<T>(object sender, string name, T? args) {
+            if (!TopicExists(sender, name)) {
+                throw new ArgumentException($"{name} does not exist!");
             }
-            try {
-                _topicsByPublisher[sender].Find(topic =>
-                        topic.EventArgsType == eventArgs.GetType()
-                        && topic.Name == name)?.Raise(sender, eventArgs);
-            }
-            catch {
-                throw new Exception("Exception was thrown on an" +
-                        " invoked topic event");
-            }
+            Raise(sender, name, args);
         }
-        public void Subscribe(EventArgs eventArgs,
-                string name, Action<object, EventArgs> action) {
-            foreach (List<Topic> topics in _topicsByPublisher.Values) {
-                foreach (Topic topic in topics) {
-                    if (topic.Name == name &&
-                        topic.EventArgsType == eventArgs.GetType()) {
-                        topic.Actions.Add(action!);
-                    }
+        private void Raise<T>(object sender, string name, T args) {
+            foreach (var topic in _topicsByPublisher[sender]) {
+                if (topic.Name != name) {
+                    continue;
+                }
+                var actions = topic.Actions;
+                foreach (var unknownAction in actions) {
+                    var castedAction = unknownAction as Action<T>;
+                    castedAction!.Invoke(args);
                 }
             }
         }
-        public void Unsubscribe(EventArgs eventArgs, string name,
-            Action<object, EventArgs> action) {
-            foreach (List<Topic> topics in _topicsByPublisher.Values) {
-                foreach (Topic topic in topics) {
-                    if (topic.Name == name && eventArgs.GetType() == topic
-                            .EventArgsType) {
-                        topic.Actions.Remove(action!);
+        public void Subscribe<T>(string name, Action<T?> action) {
+            if (!TopicExists<T>(name)) {
+                throw new ArgumentException(
+                    $"{name} does not exist or type does not match" +
+                    $" {name}'s type!");
+            }
+            foreach (var topic in _topicsByType[typeof(T)]) {
+                if (topic.Name != name) {
+                    continue;
+                }
+                topic.Actions.Add(action);
+                return;
+            }
+        }
+        public void Unsubscribe<T>(string name,
+                Action<T?> action) {
+            if (!TopicExists<T>(name)) {
+                throw new ArgumentException(
+                    $"{name} does not exist or type does not match +" +
+                    $"{name}'s type!");
+            }
+            foreach (var topic in _topicsByType[typeof(T)]) {
+                if (topic.Name != name) {
+                    continue;
+                }
+                foreach (var topicAction in topic.Actions) {
+                    var castedAction = topicAction as Action<T?>;
+                    if (ReferenceEquals(castedAction, action)) {
+                        topic.Actions.Remove(topicAction);
                         return;
                     }
                 }
             }
         }
-        public void CreateTopic(object sender, EventArgs eventArgs,
-                string name) {
+        public void CreateTopic<T>(object sender, string name) {
+            if (TopicExists(sender, name)) {
+                throw new ArgumentException($"{name} already exists!");
+            }
+            Topic topic;
             if (_topicsByPublisher.ContainsKey(sender)) {
-                _topicsByPublisher[sender].Add(new Topic(eventArgs, name));
+                topic = new Topic(name);
+                _topicsByPublisher[sender].Add(topic);
+                if (_topicsByType.ContainsKey(typeof(T?))) {
+                    _topicsByType[typeof(T)].Add(topic);
+                }
+                else {
+                    _topicsByType.Add(typeof(T), new List<Topic> { topic });
+                }
                 return;
             }
-            _topicsByPublisher.Add(sender, new List<Topic>());
-            if (TopicExists(sender, eventArgs, name)) {
-                throw new Exception("Topic already exists");
-            }
-            _topicsByPublisher[sender].Add(new Topic(eventArgs, name));
+            topic = new Topic(name);
+            _topicsByPublisher.Add(sender, new List<Topic> { topic });
+            _topicsByType.Add(typeof(T), new List<Topic> { topic });
         }
-        public void DeleteTopic(object sender, EventArgs eventArgs,
-                string name) {
-            if (!TopicExists(sender, eventArgs, name)) {
-                throw new Exception("Topic does not exist!");
+        public void DeleteTopic<T>(object sender, string name) {
+            if (!TopicExists(sender, name)) {
+                throw new ArgumentException("Topic does not exist!");
             }
-            foreach (var topic in GetTopics(sender).Where(topic =>
-                    topic.Name == name &&
-                    eventArgs.GetType() == topic.EventArgsType)) {
-                _topicsByPublisher[sender].Remove(topic);
-                return;
+            foreach (var topic in GetTopics(sender)) {
+                if (topic.Name == name) {
+                    _topicsByPublisher[sender].Remove(topic);
+                    _topicsByType[typeof(T)].Remove(topic);
+                    return;
+                }
             }
-            throw new Exception("Topic does not exist!");
         }
         private List<Topic> GetTopics(object sender) {
             if (_topicsByPublisher.ContainsKey(sender)) {
@@ -73,10 +96,27 @@ namespace YettJohan.PubSub {
             }
             throw new ArgumentException("Sender does not exist in dictionary");
         }
-        private bool TopicExists(object sender, EventArgs args, string name) {
-            return _topicsByPublisher[sender].Any(topic =>
-                    topic.EventArgsType == args.GetType() &&
-                    topic.Name == name);
+        private bool TopicExists(object sender, string name) {
+            if (!_topicsByPublisher.ContainsKey(sender)) {
+                return false;
+            }
+            foreach (var topic in _topicsByPublisher[sender]) {
+                if (topic.Name == name) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        private bool TopicExists<T>(string name) {
+            if (!_topicsByType.ContainsKey(typeof(T))) {
+                return false;
+            }
+            foreach (var topic in _topicsByType[typeof(T)]) {
+                if (topic.Name == name) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

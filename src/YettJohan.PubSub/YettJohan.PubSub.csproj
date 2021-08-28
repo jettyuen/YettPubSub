@@ -8,12 +8,16 @@
         <Authors>Jett Yuen</Authors>
         <Description>Simple and easy to use library for pub/sub design pattern.</Description>
         <PackageTags>YettJohan PubSub</PackageTags>
-        <PackageReleaseNotes>Major functionality improvements from initial release</PackageReleaseNotes>
+        <PackageReleaseNotes>Made pub/sub design much more generic by allowing topic
+arguments to be any type.</PackageReleaseNotes>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Copyright>MIT</Copyright>
         <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Version>$(VersionPrefix)2.00</Version>
+        <PackageVersion>3.0.0</PackageVersion>
+        <RepositoryUrl>https://github.com/yettjohan/YettPubSub.git</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
     </PropertyGroup>
 
 </Project>

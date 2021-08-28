@@ -11,4 +11,8 @@
       <ProjectReference Include="..\YettJohan.PubSub\YettJohan.PubSub.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="YettPubSub" Version="3.0.0" />
+    </ItemGroup>
+
 </Project>

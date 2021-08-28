@@ -2,29 +2,11 @@
 namespace YettJohan.PubSub.Executable {
     public static class Program {
         public static void Main() {
-            EventHub hub = new();
-            MockPublisher mockPublisher = new();
-            MockSubscriber mockSubscriber = new();
-            MockSubscriber anotherMockSubscriber = new();
-            hub.CreateTopic<DataPassArgs<string?>>(mockPublisher,
-                "NameBecameJettTopic");
-            hub.CreateTopic<DataPassArgs<int?>>(mockPublisher,
-                "ProcessFinishedTopic");
-            hub.Subscribe("NameBecameJettTopic", mockSubscriber.MockAction!);
-            hub.Subscribe("NameBecameJettTopic",
-                anotherMockSubscriber.MockAction!);
-            hub.Unsubscribe("NameBecameJettTopic", mockSubscriber.MockAction!);
-            hub.Subscribe("ProcessFinishedTopic",
-                anotherMockSubscriber.AnotherMockAction!);
-            const string name = "Jett";
-            string? inputName = null;
-            while (inputName != name) {
-                inputName = Console.ReadLine();
-            }
-            hub.Publish(mockPublisher, "NameBecameJettTopic", new
-                    DataPassArgs<string?>("My name is Jett"));
-            hub.Publish(mockPublisher, "ProcessFinishedTopic", new
-                    DataPassArgs<int?>(2));
+            EventHub eventHub = new EventHub();
+            eventHub.CreateTopic<int>(eventHub, "MyNewTopic");
+            eventHub.Subscribe<int>("MyNewTopic",
+                args => Console.WriteLine($"Int value received: {args}"));
+            eventHub.Publish(eventHub, "MyNewTopic", 3);
         }
     }
     public class DataPassArgs<T> {

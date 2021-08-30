@@ -15,7 +15,7 @@ arguments to be any type.</PackageReleaseNotes>
         <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Version>$(VersionPrefix)2.00</Version>
-        <PackageVersion>3.0.0</PackageVersion>
+        <PackageVersion>3.0.1</PackageVersion>
         <RepositoryUrl>https://github.com/yettjohan/YettPubSub.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
     </PropertyGroup>

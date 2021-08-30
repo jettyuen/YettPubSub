@@ -6,7 +6,7 @@ namespace YettJohan.PubSub {
                 _topicsByPublisher = new();
         private readonly Dictionary<Type, List<Topic>>
                 _topicsByType = new();
-        public void Publish<T>(object sender, string name, T? args) {
+        public void Publish<T>(object sender, string name, T args) {
             if (!TopicExists(sender, name)) {
                 throw new ArgumentException($"{name} does not exist!");
             }
@@ -24,7 +24,7 @@ namespace YettJohan.PubSub {
                 }
             }
         }
-        public void Subscribe<T>(string name, Action<T?> action) {
+        public void Subscribe<T>(string name, Action<T> action) {
             if (!TopicExists<T>(name)) {
                 throw new ArgumentException(
                     $"{name} does not exist or type does not match" +
@@ -50,7 +50,7 @@ namespace YettJohan.PubSub {
                     continue;
                 }
                 foreach (var topicAction in topic.Actions) {
-                    var castedAction = topicAction as Action<T?>;
+                    var castedAction = topicAction as Action<T>;
                     if (ReferenceEquals(castedAction, action)) {
                         topic.Actions.Remove(topicAction);
                         return;
@@ -62,21 +62,17 @@ namespace YettJohan.PubSub {
             if (TopicExists(sender, name)) {
                 throw new ArgumentException($"{name} already exists!");
             }
-            Topic topic;
+            Topic topic = new(name);
             if (_topicsByPublisher.ContainsKey(sender)) {
-                topic = new Topic(name);
                 _topicsByPublisher[sender].Add(topic);
-                if (_topicsByType.ContainsKey(typeof(T?))) {
-                    _topicsByType[typeof(T)].Add(topic);
-                }
-                else {
-                    _topicsByType.Add(typeof(T), new List<Topic> { topic });
-                }
-                return;
+            } else if (!_topicsByPublisher.ContainsKey(sender)) {
+                _topicsByPublisher.Add(sender, new List<Topic> { topic });
             }
-            topic = new Topic(name);
-            _topicsByPublisher.Add(sender, new List<Topic> { topic });
-            _topicsByType.Add(typeof(T), new List<Topic> { topic });
+            if (_topicsByType.ContainsKey(typeof(T))) {
+                _topicsByType[typeof(T)].Add(topic);
+            } else if (!_topicsByType.ContainsKey(typeof(T))) {
+                _topicsByType.Add(typeof(T), new List<Topic> { topic });
+            }
         }
         public void DeleteTopic<T>(object sender, string name) {
             if (!TopicExists(sender, name)) {
@@ -111,7 +107,7 @@ namespace YettJohan.PubSub {
             if (!_topicsByType.ContainsKey(typeof(T))) {
                 return false;
             }
-            foreach (var topic in _topicsByType[typeof(T)]) {
+            foreach (Topic topic in _topicsByType[typeof(T)]) {
                 if (topic.Name == name) {
                     return true;
                 }

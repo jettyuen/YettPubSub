@@ -5,6 +5,6 @@ namespace YettJohan.PubSub {
             Name = name;
         }
         public string Name { get;  }
-        public List<object?> Actions { get; } = new();
+        public List<object> Actions { get; } = new();
     }
 }

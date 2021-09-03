@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 namespace YettJohan.PubSub {
     public class EventHub {
-        private readonly Dictionary<object, List<Topic>>
+        private readonly Dictionary<object, Dictionary<string, Topic>>
                 _topicsByPublisher = new();
-        private readonly Dictionary<Type, List<Topic>>
+        private readonly Dictionary<Type, Dictionary<string, Topic>>
                 _topicsByType = new();
         public void Publish<T>(object sender, string name, T args) {
             if (!TopicExists(sender, name)) {
@@ -13,15 +13,9 @@ namespace YettJohan.PubSub {
             Raise(sender, name, args);
         }
         private void Raise<T>(object sender, string name, T args) {
-            foreach (var topic in _topicsByPublisher[sender]) {
-                if (topic.Name != name) {
-                    continue;
-                }
-                var actions = topic.Actions;
-                foreach (var unknownAction in actions) {
-                    var castedAction = unknownAction as Action<T>;
-                    castedAction!.Invoke(args);
-                }
+            var actions = _topicsByPublisher[sender][name].Actions;
+            foreach (var inputAction in actions) {
+                (inputAction as Action<T>)!.Invoke(args);
             }
         }
         public void Subscribe<T>(string name, Action<T> action) {
@@ -30,13 +24,7 @@ namespace YettJohan.PubSub {
                     $"{name} does not exist or type does not match" +
                     $" {name}'s type!");
             }
-            foreach (var topic in _topicsByType[typeof(T)]) {
-                if (topic.Name != name) {
-                    continue;
-                }
-                topic.Actions.Add(action);
-                return;
-            }
+            _topicsByType[typeof(T)][name].Actions.Add(action);
         }
         public void Unsubscribe<T>(string name,
                 Action<T?> action) {
@@ -45,74 +33,46 @@ namespace YettJohan.PubSub {
                     $"{name} does not exist or type does not match +" +
                     $"{name}'s type!");
             }
-            foreach (var topic in _topicsByType[typeof(T)]) {
-                if (topic.Name != name) {
-                    continue;
-                }
-                foreach (var topicAction in topic.Actions) {
-                    var castedAction = topicAction as Action<T>;
-                    if (ReferenceEquals(castedAction, action)) {
-                        topic.Actions.Remove(topicAction);
-                        return;
-                    }
-                }
-            }
+            var castedAction = _topicsByType[typeof(T)][name]
+                    .Actions.Find(obj =>
+                            obj is Action<T> action1 && action1 == action);
+            _topicsByType[typeof(T)][name].Actions.Remove(castedAction);
         }
         public void CreateTopic<T>(object sender, string name) {
             if (TopicExists(sender, name)) {
                 throw new ArgumentException($"{name} already exists!");
             }
-            Topic topic = new(name);
+            Topic topic = new();
             if (_topicsByPublisher.ContainsKey(sender)) {
-                _topicsByPublisher[sender].Add(topic);
-            } else if (!_topicsByPublisher.ContainsKey(sender)) {
-                _topicsByPublisher.Add(sender, new List<Topic> { topic });
+                _topicsByPublisher[sender].Add(name, topic);
+            }
+            else if (!_topicsByPublisher.ContainsKey(sender)) {
+                _topicsByPublisher.Add(sender, new Dictionary<string, Topic>
+                        { { name, topic } });
             }
             if (_topicsByType.ContainsKey(typeof(T))) {
-                _topicsByType[typeof(T)].Add(topic);
-            } else if (!_topicsByType.ContainsKey(typeof(T))) {
-                _topicsByType.Add(typeof(T), new List<Topic> { topic });
+                _topicsByType[typeof(T)].Add(name, topic);
+            }
+            else if (!_topicsByType.ContainsKey(typeof(T))) {
+                _topicsByType.Add(typeof(T), new Dictionary<string, Topic> {
+                        { name, topic }
+                });
             }
         }
         public void DeleteTopic<T>(object sender, string name) {
             if (!TopicExists(sender, name)) {
                 throw new ArgumentException("Topic does not exist!");
             }
-            foreach (var topic in GetTopics(sender)) {
-                if (topic.Name == name) {
-                    _topicsByPublisher[sender].Remove(topic);
-                    _topicsByType[typeof(T)].Remove(topic);
-                    return;
-                }
-            }
-        }
-        private List<Topic> GetTopics(object sender) {
-            if (_topicsByPublisher.ContainsKey(sender)) {
-                return _topicsByPublisher[sender];
-            }
-            throw new ArgumentException("Sender does not exist in dictionary");
+            _topicsByPublisher[sender].Remove(name);
+            _topicsByType[typeof(T)].Remove(name);
         }
         private bool TopicExists(object sender, string name) {
-            if (!_topicsByPublisher.ContainsKey(sender)) {
-                return false;
-            }
-            foreach (var topic in _topicsByPublisher[sender]) {
-                if (topic.Name == name) {
-                    return true;
-                }
-            }
-            return false;
+            return _topicsByPublisher.ContainsKey(sender) &&
+                    _topicsByPublisher[sender].ContainsKey(name);
         }
         private bool TopicExists<T>(string name) {
-            if (!_topicsByType.ContainsKey(typeof(T))) {
-                return false;
-            }
-            foreach (Topic topic in _topicsByType[typeof(T)]) {
-                if (topic.Name == name) {
-                    return true;
-                }
-            }
-            return false;
+            return _topicsByType.ContainsKey(typeof(T)) &&
+                    _topicsByType[typeof(T)].ContainsKey(name);
         }
     }
 }

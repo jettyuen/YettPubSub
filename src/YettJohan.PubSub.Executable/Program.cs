@@ -3,36 +3,30 @@ namespace YettJohan.PubSub.Executable {
     public static class Program {
         public static void Main() {
             EventHub eventHub = new();
-            eventHub.CreateTopic<int>(eventHub, "MyNewTopic");
-            eventHub.CreateTopic<int>(eventHub, "MyOtherTopic");
-            eventHub.CreateTopic<int>(eventHub, "MyOtherOtherTopic");
-            eventHub.Subscribe<int>("MyNewTopic",
-                args => Console.WriteLine($"Int value received: {args}"));
-            eventHub.Publish(eventHub, "MyNewTopic", 3);
+            var mockPub = new MockPublisher();
+            eventHub.CreateTopic<int>(mockPub, "MyNewTopic");
+            var mockSub = new MockSubscriber(eventHub);
+
+            eventHub.Subscribe<int>("MyNewTopic", Console.WriteLine);
+            eventHub.Publish(mockPub, "MyNewTopic", 3);
+            eventHub.Publish(mockPub, "MyNewTopic", 4);
         }
-    }
-    public class DataPassArgs<T> {
-        public DataPassArgs() {
-        }
-        public DataPassArgs(T? value) {
-            Value = value;
-        }
-        public T? Value { get; set; }
     }
     public class MockPublisher {
     }
     public class MockSubscriber {
-        public MockSubscriber() {
+        public MockSubscriber(EventHub eventHub) {
             MockAction = PrintStringValue;
             AnotherMockAction = PrintIntValue;
+            eventHub.Subscribe("MyNewTopic", AnotherMockAction);
         }
-        public Action<DataPassArgs<string>> MockAction { get; }
-        public Action<DataPassArgs<int>> AnotherMockAction { get; }
-        private void PrintStringValue(DataPassArgs<string> args) {
-            Console.WriteLine("Value:" + args.Value);
+        private Action<string> MockAction { get; }
+        private Action<int> AnotherMockAction { get; }
+        private void PrintStringValue(string args) {
+            Console.WriteLine("Value:" + args);
         }
-        private void PrintIntValue(DataPassArgs<int> args) {
-            Console.WriteLine("Value:" + args.Value);
+        private void PrintIntValue(int args) {
+            Console.WriteLine("Value:" + args);
         }
     }
 }

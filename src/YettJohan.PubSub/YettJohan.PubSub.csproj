@@ -8,8 +8,9 @@
         <Authors>Jett Yuen</Authors>
         <Description>Simple and easy to use library for pub/sub design pattern.</Description>
         <PackageTags>YettJohan PubSub</PackageTags>
-        <PackageReleaseNotes>Made pub/sub design much more generic by allowing topic
-arguments to be any type.</PackageReleaseNotes>
+        <PackageReleaseNotes>Fixed bug involving creating topics of the same type in different
+            publisher classes.
+        </PackageReleaseNotes>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Copyright>MIT</Copyright>
         <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>

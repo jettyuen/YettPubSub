@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 namespace YettJohan.PubSub {
     public class EventHub {
+        private static EventHub? _instance;
         private readonly Dictionary<object, Dictionary<string, Topic>>
                 _topicsByPublisher = new();
         private readonly Dictionary<Type, Dictionary<string, Topic>>
                 _topicsByType = new();
+        private EventHub() {
+        }
+        public static EventHub Instance => _instance ??= new EventHub();
         public void Publish<T>(object sender, string name, T args) {
             if (!TopicExists(sender, name)) {
                 throw new ArgumentException($"{name} does not exist!");

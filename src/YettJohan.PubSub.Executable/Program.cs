@@ -2,23 +2,21 @@
 namespace YettJohan.PubSub.Executable {
     public static class Program {
         public static void Main() {
-            EventHub eventHub = new();
             var mockPub = new MockPublisher();
-            eventHub.CreateTopic<int>(mockPub, "MyNewTopic");
-            var mockSub = new MockSubscriber(eventHub);
-
-            eventHub.Subscribe<int>("MyNewTopic", Console.WriteLine);
-            eventHub.Publish(mockPub, "MyNewTopic", 3);
-            eventHub.Publish(mockPub, "MyNewTopic", 4);
+            EventHub.Instance.CreateTopic<int>(mockPub, "MyNewTopic");
+            var mockSub = new MockSubscriber();
+            EventHub.Instance.Subscribe<int>("MyNewTopic", Console.WriteLine);
+            EventHub.Instance.Publish(mockPub, "MyNewTopic", 3);
+            EventHub.Instance.Publish(mockPub, "MyNewTopic", 4);
         }
     }
     public class MockPublisher {
     }
     public class MockSubscriber {
-        public MockSubscriber(EventHub eventHub) {
+        public MockSubscriber() {
             MockAction = PrintStringValue;
             AnotherMockAction = PrintIntValue;
-            eventHub.Subscribe("MyNewTopic", AnotherMockAction);
+            EventHub.Instance.Subscribe("MyNewTopic", AnotherMockAction);
         }
         private Action<string> MockAction { get; }
         private Action<int> AnotherMockAction { get; }

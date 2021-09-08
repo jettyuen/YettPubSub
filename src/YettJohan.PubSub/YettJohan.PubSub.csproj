@@ -6,17 +6,15 @@
         <PackageId>YettPubSub</PackageId>
         <Title>YettPubSub</Title>
         <Authors>Jett Yuen</Authors>
-        <Description>Simple and easy to use library for pub/sub design pattern.</Description>
+        <Description>Minimal, extensible, event publisher/subscriber class library.</Description>
         <PackageTags>YettJohan PubSub</PackageTags>
-        <PackageReleaseNotes>Fixed bug involving creating topics of the same type in different
-            publisher classes.
-        </PackageReleaseNotes>
+        <PackageReleaseNotes>Made EventHub a singleton to be a little more practical to use in an application.</PackageReleaseNotes>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Copyright>MIT</Copyright>
         <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Version>$(VersionPrefix)2.00</Version>
-        <PackageVersion>3.0.1</PackageVersion>
+        <PackageVersion>3.2.0</PackageVersion>
         <RepositoryUrl>https://github.com/yettjohan/YettPubSub.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
     </PropertyGroup>
